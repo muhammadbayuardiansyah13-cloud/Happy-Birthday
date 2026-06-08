@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Mission</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #FFC7E3;
+    --pink-dark: #f9a8d4;
+    --pink-deep: #ec4899;
+    --white: #ffffff;
+    --purple: #E6D6FF;
+    --purple-mid: #c4b0ff;
+    --gold: #D4A843;
+    --gold-light: #f0c96a;
+    --text-dark: #5a2d5a;
+    --text-mid: #7a4a7a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Quicksand', sans-serif;
+    background: linear-gradient(135deg, #fff5f9 0%, #fce4f1 50%, #ede9ff 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* CONFETTI */
+  .confetti-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  .confetti-piece {
+    position: absolute;
+    width: 10px; height: 10px;
+    top: -20px;
+    animation: confettiFall linear forwards;
+    border-radius: 2px;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* FIREWORKS */
+  .fireworks-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  .spark {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    animation: sparkFly ease-out forwards;
+  }
+
+  @keyframes sparkFly {
+    0% { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+  }
+
+  /* HEARTS FLOATING */
+  .heart-float {
+    position: fixed;
+    font-size: 18px;
+    pointer-events: none;
+    z-index: 100;
+    animation: floatHeart 3s ease-out forwards;
+    color: #ec4899;
+  }
+
+  @keyframes floatHeart {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-200px) scale(0.5); opacity: 0; }
+  }
+
+  /* BALLOONS */
+  .balloon {
+    position: fixed;
+    bottom: 0;
+    width: 60px;
+    z-index: 10;
+    animation: sway 3s ease-in-out infinite alternate;
+  }
+  .balloon.left { left: 15px; animation-delay: 0s; }
+  .balloon.right { right: 15px; animation-delay: 0.7s; }
+  .balloon.left2 { left: 80px; animation-delay: 1.2s; }
+  .balloon.right2 { right: 80px; animation-delay: 0.3s; }
+
+  @keyframes sway {
+    0% { transform: rotate(-8deg) translateY(-10px); }
+    100% { transform: rotate(8deg) translateY(0px); }
+  }
+
+  .balloon svg { width: 100%; }
+
+  /* PAGE SYSTEM */
+  .page {
+    display: none;
+    min-height: 100vh;
+    position: relative;
+  }
+  .page.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+  /* HAT DECORATION */
+  .hat-decoration {
+    font-size: 48px;
+    margin-bottom: 10px;
+    animation: bounce 1s ease-in-out infinite alternate;
+  }
+  @keyframes bounce {
+    from { transform: translateY(0) rotate(-5deg); }
+    to { transform: translateY(-10px) rotate(5deg); }
+  }
+
+  /* CARD */
+  .card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 28px;
+    padding: 44px 40px;
+    max-width: 560px;
+    width: 90%;
+    margin: 20px auto;
+    box-shadow: 0 8px 40px rgba(236,72,153,0.12), 0 2px 12px rgba(196,176,255,0.15);
+    border: 1.5px solid rgba(255,199,227,0.6);
+    text-align: center;
+    position: relative;
+    z-index: 20;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    color: var(--text-dark);
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+
+  .page-subtitle {
+    color: var(--text-mid);
+    font-size: 1.1rem;
+    line-height: 1.7;
+    font-weight: 500;
+  }
+
+  .gold-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  /* BUTTON */
+  .btn {
+    display: inline-block;
+    margin-top: 28px;
+    padding: 14px 40px;
+    background: linear-gradient(135deg, var(--pink-deep), #c026d3);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(236,72,153,0.35);
+  }
+
+  .btn:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 8px 30px rgba(236,72,153,0.5);
+  }
+
+  .btn:active { transform: translateY(0) scale(0.98); }
+
+  .btn-love {
+    background: linear-gradient(135deg, #ec4899, #f43f5e);
+    font-size: 1.15rem;
+    padding: 16px 48px;
+    animation: pulse-btn 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-btn {
+    0%, 100% { box-shadow: 0 4px 20px rgba(236,72,153,0.35); }
+    50% { box-shadow: 0 4px 40px rgba(236,72,153,0.7); }
+  }
+
+  /* QUESTION PAGE */
+  .question-number {
+    font-size: 0.85rem;
+    color: var(--purple-mid);
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .riddle-text {
+    font-size: 1.05rem;
+    color: var(--text-mid);
+    line-height: 1.9;
+    margin: 18px 0 24px;
+    font-style: italic;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .answer-input {
+    width: 100%;
+    padding: 14px 20px;
+    border: 2px solid var(--pink);
+    border-radius: 16px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    background: rgba(255,255,255,0.9);
+    outline: none;
+    transition: all 0.3s;
+    text-align: center;
+  }
+
+  .answer-input:focus {
+    border-color: var(--pink-deep);
+    box-shadow: 0 0 0 4px rgba(236,72,153,0.12);
+  }
+
+  .answer-input.wrong {
+    border-color: #f43f5e;
+    animation: shake 0.5s ease;
+    box-shadow: 0 0 0 4px rgba(244,63,94,0.15);
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+  }
+
+  .error-msg {
+    color: #f43f5e;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap {
+    width: 100%;
+    background: var(--purple);
+    border-radius: 10px;
+    height: 8px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pink-deep), #c026d3);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+  }
+
+  /* SUCCESS PAGE */
+  .success-emoji {
+    font-size: 3rem;
+    animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* GREETING PAGE */
+  #page-greeting {
+    background: linear-gradient(160deg, #fff0f7 0%, #fce4f1 40%, #ede9ff 100%);
+    padding: 40px 20px 80px;
+  }
+
+  .greeting-header {
+    text-align: center;
+    margin-bottom: 36px;
+    position: relative;
+    z-index: 20;
+  }
+
+  .greeting-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+  }
+
+  /* SLIDESHOW */
+  .slideshow-container {
+    position: relative;
+    max-width: 460px;
+    width: 90%;
+    margin: 0 auto 36px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 12px 48px rgba(236,72,153,0.2);
+    aspect-ratio: 4/3;
+    background: var(--pink);
+    z-index: 20;
+  }
+
+  .slide {
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  .slide.active {
+    display: block;
+    animation: fadeSlide 0.7s ease;
+  }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: scale(1.04); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .slide-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: var(--text-dark);
+    font-size: 1rem;
+    font-weight: 600;
+    gap: 8px;
+  }
+
+  .slide-caption {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(90,45,90,0.6));
+    color: white;
+    padding: 24px 16px 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .slide-nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 28px;
+    z-index: 20;
+    position: relative;
+  }
+
+  .slide-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--pink-dark);
+    cursor: pointer;
+    transition: all 0.3s;
+    opacity: 0.5;
+  }
+
+  .slide-dot.active { opacity: 1; background: var(--pink-deep); transform: scale(1.3); }
+
+  /* GREETING TEXT */
+  .greeting-card {
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(12px);
+    border-radius: 28px;
+    padding: 40px 36px;
+    max-width: 560px;
+    width: 90%;
+    margin: 0 auto 32px;
+    box-shadow: 0 8px 40px rgba(236,72,153,0.12);
+    border: 1.5px solid rgba(255,199,227,0.6);
+    position: relative;
+    z-index: 20;
+  }
+
+  .greeting-text {
+    font-size: 1.05rem;
+    color: var(--text-mid);
+    line-height: 1.9;
+    font-weight: 500;
+  }
+
+  .greeting-text p { margin-bottom: 16px; }
+  .greeting-text p:last-child { margin-bottom: 0; }
+
+  /* LOVE RESPONSE */
+  .love-response {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(255,240,247,0.95);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9990;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .love-response.show { display: flex; }
+
+  .love-response-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--pink-deep);
+    text-align: center;
+    padding: 0 24px;
+    animation: fadeInUp 1s ease;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* MUSIC NOTE INDICATOR */
+  .music-note {
+    position: fixed;
+    top: 16px; right: 16px;
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 2px 12px rgba(236,72,153,0.2);
+    font-size: 18px;
+    transition: all 0.3s;
+    color: var(--text-dark);
+    font-weight: 700;
+  }
+
+  .music-note:hover { transform: scale(1.1); }
+
+  /* DECORATIVE ELEMENTS */
+  .star-bg {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.15;
+  }
+
+  /* SLIDE ARROWS */
+  .slide-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.7);
+    border: none;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 30;
+    transition: all 0.3s;
+    color: var(--text-dark);
+    font-weight: 700;
+  }
+  .slide-arrow:hover { background: rgba(255,255,255,0.95); }
+  .slide-arrow.prev { left: 10px; }
+  .slide-arrow.next { right: 10px; }
+
+  /* ANIMATIONS for greeting entrance */
+  .fade-in {
+    animation: fadeInUp 0.8s ease forwards;
+    opacity: 0;
+  }
+  .fade-in-1 { animation-delay: 0.1s; }
+  .fade-in-2 { animation-delay: 0.4s; }
+  .fade-in-3 { animation-delay: 0.7s; }
+  .fade-in-4 { animation-delay: 1s; }
+
+  @media (max-width: 480px) {
+    .card { padding: 32px 22px; }
+    .page-title { font-size: 1.5rem; }
+    .gold-title { font-size: 1.6rem; }
+    .greeting-title { font-size: 1.8rem; }
+    .love-response-text { font-size: 1.5rem; }
+    .greeting-card { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MUSIC TOGGLE -->
+<div class="music-note" id="musicToggle" title="Toggle musik" onclick="toggleMusic()">▶️</div>
+
+<!-- AUDIO -->
+<audio id="bgMusic" loop>
+  <source src="lagu.mp3" type="audio/mpeg">
+</audio>
+
+<!-- BALLOONS -->
+<div class="balloon left" id="balloonLeft">
+  <svg viewBox="0 0 60 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="30" cy="34" rx="26" ry="32" fill="#FFC7E3"/>
+    <ellipse cx="30" cy="34" rx="26" ry="32" fill="url(#b1)" opacity="0.4"/>
+    <path d="M30 66 Q27 72 30 78 Q33 72 30 66Z" fill="#FFC7E3"/>
+    <line x1="30" y1="78" x2="30" y2="90" stroke="#f9a8d4" stroke-width="1.5"/>
+    <defs>
+      <radialGradient id="b1" cx="35%" cy="30%">
+        <stop offset="0%" stop-color="white"/>
+        <stop offset="100%" stop-color="#FFC7E3"/>
+      </radialGradient>
+    </defs>
+  </svg>
+</div>
+<div class="balloon right" id="balloonRight">
+  <svg viewBox="0 0 60 90" fill="none">
+    <ellipse cx="30" cy="34" rx="26" ry="32" fill="#E6D6FF"/>
+    <ellipse cx="30" cy="34" rx="26" ry="32" fill="url(#b2)" opacity="0.4"/>
+    <path d="M30 66 Q27 72 30 78 Q33 72 30 66Z" fill="#E6D6FF"/>
+    <line x1="30" y1="78" x2="30" y2="90" stroke="#c4b0ff" stroke-width="1.5"/>
+    <defs>
+      <radialGradient id="b2" cx="35%" cy="30%">
+        <stop offset="0%" stop-color="white"/>
+        <stop offset="100%" stop-color="#E6D6FF"/>
+      </radialGradient>
+    </defs>
+  </svg>
+</div>
+<div class="balloon left2" id="balloonLeft2">
+  <svg viewBox="0 0 60 90" fill="none">
+    <ellipse cx="30" cy="34" rx="26" ry="32" fill="#f9c6e3"/>
+    <ellipse cx="30" cy="34" rx="26" ry="32" fill="url(#b3)" opacity="0.4"/>
+    <path d="M30 66 Q27 72 30 78 Q33 72 30 66Z" fill="#f9c6e3"/>
+    <line x1="30" y1="78" x2="30" y2="90" stroke="#f9a8d4" stroke-width="1.5"/>
+    <defs>
+      <radialGradient id="b3" cx="35%" cy="30%">
+        <stop offset="0%" stop-color="white"/>
+        <stop offset="100%" stop-color="#f9c6e3"/>
+      </radialGradient>
+    </defs>
+  </svg>
+</div>
+<div class="balloon right2" id="balloonRight2">
+  <svg viewBox="0 0 60 90" fill="none">
+    <ellipse cx="30" cy="34" rx="26" ry="32" fill="#d8b4fe"/>
+    <ellipse cx="30" cy="34" rx="26" ry="32" fill="url(#b4)" opacity="0.4"/>
+    <path d="M30 66 Q27 72 30 78 Q33 72 30 66Z" fill="#d8b4fe"/>
+    <line x1="30" y1="78" x2="30" y2="90" stroke="#c4b0ff" stroke-width="1.5"/>
+    <defs>
+      <radialGradient id="b4" cx="35%" cy="30%">
+        <stop offset="0%" stop-color="white"/>
+        <stop offset="100%" stop-color="#d8b4fe"/>
+      </radialGradient>
+    </defs>
+  </svg>
+</div>
+
+<!-- CONFETTI CONTAINER -->
+<div class="confetti-container" id="confettiContainer"></div>
+<!-- FIREWORKS CONTAINER -->
+<div class="fireworks-container" id="fireworksContainer"></div>
+
+<!-- ===== PAGE 0: INTRO ===== -->
+<div class="page active" id="page-intro">
+  <div class="card" style="animation: fadeInUp 0.8s ease;">
+    <div class="hat-decoration">
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+        <polygon points="30,4 6,54 54,54" fill="#FFC7E3" stroke="#E6D6FF" stroke-width="2"/>
+        <polygon points="30,4 18,29 42,29" fill="#E6D6FF" opacity="0.6"/>
+        <circle cx="30" cy="4" r="4" fill="#D4A843"/>
+        <rect x="6" y="52" width="48" height="6" rx="3" fill="#f9a8d4"/>
+        <circle cx="18" cy="35" r="2" fill="#D4A843"/>
+        <circle cx="38" cy="40" r="2" fill="#ec4899"/>
+        <circle cx="25" cy="45" r="1.5" fill="#c026d3"/>
+      </svg>
+    </div>
+    <div class="gold-title">Birthday Mission</div>
+    <p style="font-size:0.8rem; color:var(--purple-mid); letter-spacing:2px; text-transform:uppercase; margin:6px 0 20px; font-weight:700;">For My Favorite Person</p>
+    <p class="page-title">Sebelum membuka hadiah ulang tahun ini, ada 6 pertanyaan yang harus kamu jawab.</p>
+    <p class="page-subtitle" style="margin-top:16px;">
+      Tenang aja...<br><br>
+      Semua jawabannya ada di kehidupan kamu
+    </p>
+    <button class="btn" onclick="showPage('page-q1')">Mulai</button>
+  </div>
+</div>
+
+<!-- ===== QUESTIONS ===== -->
+<!-- Q1 -->
+<div class="page" id="page-q1">
+  <div class="card">
+    <div class="question-number">Pertanyaan 1 dari 6</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:16%"></div></div>
+    <p class="page-title">Teka-Teki</p>
+    <p class="riddle-text">
+      Aku bukan tanggal lahir.<br>
+      Aku bukan umur.<br>
+      Aku juga bukan tinggi badan.<br><br>
+      Tapi setiap kali kamu membeli teman untuk kakimu,<br>
+      aku selalu ditanyakan terlebih dahulu.
+    </p>
+    <input type="text" class="answer-input" id="ans1" placeholder="Jawaban kamu..." onkeydown="if(event.key==='Enter') checkAnswer(1)">
+    <p class="error-msg" id="err1">Hmm, bukan itu... Coba lagi ya!</p>
+    <button class="btn" onclick="checkAnswer(1)">Jawab</button>
+  </div>
+</div>
+
+<!-- Q2 -->
+<div class="page" id="page-q2">
+  <div class="card">
+    <div class="question-number">Pertanyaan 2 dari 6</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:33%"></div></div>
+    <p class="page-title">Teka-Teki</p>
+    <p class="riddle-text">
+      Aku adalah warna yang sering membuatmu terlihat manis.<br>
+      Banyak orang menganggapku warna cinta dan kelembutan.<br><br>
+      Aku bukan merah.<br>
+      Tapi masih satu keluarga dengannya.
+    </p>
+    <input type="text" class="answer-input" id="ans2" placeholder="Jawaban kamu..." onkeydown="if(event.key==='Enter') checkAnswer(2)">
+    <p class="error-msg" id="err2">Hmm, bukan itu... Coba lagi ya!</p>
+    <button class="btn" onclick="checkAnswer(2)">Jawab</button>
+  </div>
+</div>
+
+<!-- Q3 -->
+<div class="page" id="page-q3">
+  <div class="card">
+    <div class="question-number">Pertanyaan 3 dari 6</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:50%"></div></div>
+    <p class="page-title">Teka-Teki</p>
+    <p class="riddle-text">
+      Banyak orang tidak bisa hidup tanpaku.<br>
+      Aku hampir selalu hadir saat makan.<br><br>
+      Tapi anehnya...<br>
+      Kamu justru sering menghindariku.
+    </p>
+    <input type="text" class="answer-input" id="ans3" placeholder="Jawaban kamu..." onkeydown="if(event.key==='Enter') checkAnswer(3)">
+    <p class="error-msg" id="err3">Hmm, bukan itu... Coba lagi ya!</p>
+    <button class="btn" onclick="checkAnswer(3)">Jawab</button>
+  </div>
+</div>
+
+<!-- Q4 -->
+<div class="page" id="page-q4">
+  <div class="card">
+    <div class="question-number">Pertanyaan 4 dari 6</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:66%"></div></div>
+    <p class="page-title">Teka-Teki</p>
+    <p class="riddle-text">
+      Aku kecil.<br>
+      Aku bulat.<br>
+      Aku sering jadi teman saat ngobrol santai.<br><br>
+      Isianku bermacam-macam.<br>
+      Dan aku termasuk salah satu makanan favoritmu.
+    </p>
+    <input type="text" class="answer-input" id="ans4" placeholder="Jawaban kamu..." onkeydown="if(event.key==='Enter') checkAnswer(4)">
+    <p class="error-msg" id="err4">Hmm, bukan itu... Coba lagi ya!</p>
+    <button class="btn" onclick="checkAnswer(4)">Jawab</button>
+  </div>
+</div>
+
+<!-- Q5 -->
+<div class="page" id="page-q5">
+  <div class="card">
+    <div class="question-number">Pertanyaan 5 dari 6</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:83%"></div></div>
+    <p class="page-title">Teka-Teki</p>
+    <p class="riddle-text">
+      Aku pedas.<br>
+      Aku ramai isi.<br>
+      Aku sering bikin orang kepanasan.<br><br>
+      Tapi justru itulah alasan kamu menyukaiku.
+    </p>
+    <input type="text" class="answer-input" id="ans5" placeholder="Jawaban kamu..." onkeydown="if(event.key==='Enter') checkAnswer(5)">
+    <p class="error-msg" id="err5">Hmm, bukan itu... Coba lagi ya!</p>
+    <button class="btn" onclick="checkAnswer(5)">Jawab</button>
+  </div>
+</div>
+
+<!-- Q6 -->
+<div class="page" id="page-q6">
+  <div class="card">
+    <div class="question-number">Pertanyaan 6 dari 6</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:100%"></div></div>
+    <p class="page-title">Teka-Teki</p>
+    <p class="riddle-text">
+      Ada satu rasa yang sering disukai banyak orang.<br>
+      Katanya bikin kopi atau teh terasa lebih "dewasa".<br><br>
+      Tapi setiap kali rasa ini datang,<br>
+      kamu biasanya langsung bilang "nggak enak".
+    </p>
+    <input type="text" class="answer-input" id="ans6" placeholder="Jawaban kamu..." onkeydown="if(event.key==='Enter') checkAnswer(6)">
+    <p class="error-msg" id="err6">Hmm, bukan itu... Coba lagi ya!</p>
+    <button class="btn" onclick="checkAnswer(6)">Jawab</button>
+  </div>
+</div>
+
+<!-- ===== SUCCESS PAGE ===== -->
+<div class="page" id="page-success">
+  <div class="card" style="text-align:center;">
+    <span class="success-emoji">&#127881;</span>
+    <div class="gold-title" style="font-size:2.2rem; margin-bottom:10px;">Selamat...</div>
+    <p class="page-title" style="font-size:1.4rem; color:var(--pink-deep);">
+      Kamu berhasil membuka hadiah ulang tahun ini
+    </p>
+    <p class="page-subtitle" style="margin-top:12px;">Semua jawaban kamu benar! Sekarang saatnya...</p>
+    <button class="btn" style="background:linear-gradient(135deg,#D4A843,#f0c96a); margin-top:28px;" onclick="showGreeting()">Buka Hadiah</button>
+  </div>
+</div>
+
+<!-- ===== GREETING PAGE ===== -->
+<div class="page" id="page-greeting" style="display:none; flex-direction:column; padding-top:40px;">
+
+  <div class="greeting-header fade-in fade-in-1">
+    <div style="font-size:2.5rem; margin-bottom:8px;">
+      <svg width="48" height="48" viewBox="0 0 48 48" style="display:inline-block; vertical-align:middle;">
+        <text y="38" font-size="38">&#127874;</text>
+      </svg>
+    </div>
+    <div class="gold-title" style="font-size:2rem;">Selamat Ulang Tahun Sayang</div>
+    <div style="color:#ec4899; font-size:1.5rem; margin-top:4px; font-family:'Playfair Display',serif;">&#10084;&#65039;</div>
+  </div>
+
+  <!-- SLIDESHOW -->
+  <div class="slideshow-container fade-in fade-in-2" style="position:relative;">
+    <div class="slide active" id="slide1">
+      <img src="pertama.jpg" alt="Foto pertama bersama" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+      <div class="slide-placeholder" style="display:none;">
+        <div style="font-size:2rem;">&#128247;</div>
+        <div>pertama.jpg</div>
+        <div style="font-size:0.8rem; opacity:0.7;">Foto pertama bersama</div>
+      </div>
+      <div class="slide-caption">Foto pertama bersama</div>
+    </div>
+    <div class="slide" id="slide2">
+      <img src="lucu.jpg" alt="Foto paling lucu" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+      <div class="slide-placeholder" style="display:none;">
+        <div style="font-size:2rem;">&#128247;</div>
+        <div>lucu.jpg</div>
+        <div style="font-size:0.8rem; opacity:0.7;">Foto paling lucu</div>
+      </div>
+      <div class="slide-caption">Foto paling lucu</div>
+    </div>
+    <div class="slide" id="slide3">
+      <img src="favorit.jpg" alt="Foto favorit" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+      <div class="slide-placeholder" style="display:none;">
+        <div style="font-size:2rem;">&#128247;</div>
+        <div>favorit.jpg</div>
+        <div style="font-size:0.8rem; opacity:0.7;">Foto favorit</div>
+      </div>
+      <div class="slide-caption">Foto favorit kamu</div>
+    </div>
+    <div class="slide" id="slide4">
+      <img src="aesthetic.jpg" alt="Foto aesthetic" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+      <div class="slide-placeholder" style="display:none;">
+        <div style="font-size:2rem;">&#128247;</div>
+        <div>aesthetic.jpg</div>
+        <div style="font-size:0.8rem; opacity:0.7;">Foto paling aesthetic</div>
+      </div>
+      <div class="slide-caption">Foto paling aesthetic</div>
+    </div>
+    <div class="slide" id="slide5">
+      <img src="baru.jpg" alt="Foto terbaru" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+      <div class="slide-placeholder" style="display:none;">
+        <div style="font-size:2rem;">&#128247;</div>
+        <div>baru.jpg</div>
+        <div style="font-size:0.8rem; opacity:0.7;">Foto terbaru</div>
+      </div>
+      <div class="slide-caption">Foto terbaru</div>
+    </div>
+    <button class="slide-arrow prev" onclick="changeSlide(-1)">&#8249;</button>
+    <button class="slide-arrow next" onclick="changeSlide(1)">&#8250;</button>
+  </div>
+
+  <div class="slide-nav fade-in fade-in-2">
+    <div class="slide-dot active" onclick="goSlide(0)"></div>
+    <div class="slide-dot" onclick="goSlide(1)"></div>
+    <div class="slide-dot" onclick="goSlide(2)"></div>
+    <div class="slide-dot" onclick="goSlide(3)"></div>
+    <div class="slide-dot" onclick="goSlide(4)"></div>
+  </div>
+
+  <!-- GREETING TEXT -->
+  <div class="greeting-card fade-in fade-in-3">
+    <div class="greeting-text">
+      <p style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--pink-deep); font-weight:700;">Selamat ulang tahun sayang &#10084;&#65039;</p>
+      <p>Hari ini adalah hari spesial, karena di tanggal ini lahir seseorang yang begitu berarti dalam hidup aku.</p>
+      <p>Terima kasih karena sudah hadir dan menjadi bagian dari banyak cerita yang aku jalani sampai hari ini.</p>
+      <p>Terima kasih untuk semua tawa, perhatian, dukungan, dan kebahagiaan yang sudah kamu berikan.</p>
+      <p>Semoga di usia yang baru ini, semua hal baik datang menghampiri kamu.</p>
+      <p>Semoga kesehatan, kebahagiaan, dan segala impian yang sedang kamu perjuangkan bisa terwujud satu per satu.</p>
+      <p>Tetap jadi pribadi yang ceria, kuat, dan baik hati seperti yang selama ini aku kenal.</p>
+      <p>Dan semoga aku masih bisa ikut menemani banyak ulang tahun kamu berikutnya.</p>
+      <p style="font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--pink-deep); text-align:center; margin-top:8px;">&#10084;&#65039;</p>
+    </div>
+  </div>
+
+  <div class="fade-in fade-in-4" style="margin-bottom:60px; text-align:center; position:relative; z-index:20;">
+    <button class="btn btn-love" onclick="showLove()">Aku Sayang Kamu</button>
+  </div>
+</div>
+
+<!-- LOVE RESPONSE OVERLAY -->
+<div class="love-response" id="loveResponse">
+  <div class="love-response-text">
+    Terima kasih sudah hadir di hidup aku &#10084;&#65039;
+  </div>
+  <button class="btn" style="margin-top:0;" onclick="document.getElementById('loveResponse').classList.remove('show')">Tutup</button>
+</div>
+
+<script>
+// ===== ANSWERS =====
+const answers = {
+  1: ['38','39','ukuran 38','ukuran 39','no 38','no 39','nomor 38','nomor 39','size 38','size 39'],
+  2: ['pink','warna pink','merah muda','warna merah muda'],
+  3: ['nasi'],
+  4: ['dimsum','dim sum'],
+  5: ['seblak'],
+  6: ['pahit','rasa pahit','pait','rasa pait']
+};
+
+// ===== AUDIO =====
+let musicPlaying = false;
+const music = document.getElementById('bgMusic');
+
+function toggleMusic() {
+  if (musicPlaying) {
+    music.pause();
+    musicPlaying = false;
+    document.getElementById('musicToggle').style.opacity = '0.4';
+  } else {
+    music.play().catch(()=>{});
+    musicPlaying = true;
+    document.getElementById('musicToggle').style.opacity = '1';
+  }
+}
+
+// auto-play attempt
+window.addEventListener('click', function autoPlay() {
+  if (!musicPlaying) {
+    music.play().then(() => { musicPlaying = true; }).catch(()=>{});
+  }
+  window.removeEventListener('click', autoPlay);
+}, { once: true });
+
+// ===== PAGE NAVIGATION =====
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = '';
+  });
+  const target = document.getElementById(id);
+  target.style.display = 'flex';
+  target.classList.add('active');
+  // focus on input if question page
+  const inp = target.querySelector('.answer-input');
+  if (inp) setTimeout(() => inp.focus(), 300);
+}
+
+// ===== CHECK ANSWER =====
+function checkAnswer(num) {
+  const inp = document.getElementById('ans' + num);
+  const err = document.getElementById('err' + num);
+  const val = inp.value.trim().toLowerCase();
+  const valid = answers[num];
+
+  if (valid.includes(val)) {
+    triggerConfetti();
+    err.style.display = 'none';
+    inp.style.borderColor = '#10b981';
+    setTimeout(() => {
+      if (num < 6) showPage('page-q' + (num + 1));
+      else showPage('page-success');
+      inp.style.borderColor = '';
+      inp.value = '';
+    }, 600);
+  } else {
+    inp.classList.remove('wrong');
+    void inp.offsetWidth;
+    inp.classList.add('wrong');
+    err.style.display = 'block';
+    setTimeout(() => inp.classList.remove('wrong'), 600);
+  }
+}
+
+// ===== SHOW GREETING =====
+function showGreeting() {
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+  const gp = document.getElementById('page-greeting');
+  gp.style.display = 'flex';
+  gp.classList.add('active');
+  triggerFireworks();
+  setTimeout(() => triggerFireworks(), 1200);
+  setTimeout(() => triggerFireworks(), 2400);
+  startSlideshow();
+}
+
+// ===== SHOW LOVE =====
+function showLove() {
+  document.getElementById('loveResponse').classList.add('show');
+  triggerFireworks();
+  setTimeout(() => triggerFireworks(), 500);
+  setTimeout(() => triggerFireworks(), 1000);
+  setTimeout(() => triggerFireworks(), 1500);
+  setTimeout(() => triggerFireworks(), 2000);
+}
+
+// ===== CONFETTI =====
+function triggerConfetti() {
+  const container = document.getElementById('confettiContainer');
+  const colors = ['#FFC7E3','#E6D6FF','#D4A843','#ec4899','#c026d3','#f9a8d4','#ffffff'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.width = (6 + Math.random() * 8) + 'px';
+    piece.style.height = (6 + Math.random() * 8) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    piece.style.animationDelay = Math.random() * 0.5 + 's';
+    container.appendChild(piece);
+    setTimeout(() => piece.remove(), 3500);
+  }
+}
+
+// ===== FIREWORKS =====
+function triggerFireworks() {
+  const container = document.getElementById('fireworksContainer');
+  const colors = ['#FFC7E3','#E6D6FF','#D4A843','#ec4899','#c026d3','#f9a8d4','#ffffff','#f0c96a'];
+  const cx = 15 + Math.random() * 70;
+  const cy = 10 + Math.random() * 60;
+
+  for (let i = 0; i < 24; i++) {
+    const spark = document.createElement('div');
+    spark.className = 'spark';
+    spark.style.left = cx + 'vw';
+    spark.style.top = cy + 'vh';
+    spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+    const angle = (i / 24) * 360;
+    const dist = 60 + Math.random() * 80;
+    const rad = angle * Math.PI / 180;
+    spark.style.setProperty('--dx', Math.cos(rad) * dist + 'px');
+    spark.style.setProperty('--dy', Math.sin(rad) * dist + 'px');
+    spark.style.animationDuration = (0.6 + Math.random() * 0.6) + 's';
+    spark.style.animationDelay = Math.random() * 0.2 + 's';
+    container.appendChild(spark);
+    setTimeout(() => spark.remove(), 1500);
+  }
+}
+
+// ===== HEARTS ON SCROLL =====
+let heartTimer = null;
+window.addEventListener('scroll', () => {
+  if (heartTimer) return;
+  heartTimer = setTimeout(() => {
+    spawnHeart();
+    heartTimer = null;
+  }, 100);
+});
+
+function spawnHeart() {
+  const h = document.createElement('div');
+  h.className = 'heart-float';
+  h.innerHTML = '&#10084;';
+  h.style.left = (10 + Math.random() * 80) + 'vw';
+  h.style.bottom = (10 + Math.random() * 30) + 'vh';
+  h.style.fontSize = (14 + Math.random() * 14) + 'px';
+  h.style.animationDuration = (2 + Math.random()) + 's';
+  document.body.appendChild(h);
+  setTimeout(() => h.remove(), 3000);
+}
+
+// ===== SLIDESHOW =====
+let currentSlide = 0;
+const totalSlides = 5;
+let slideInterval;
+
+function changeSlide(dir) {
+  currentSlide = (currentSlide + dir + totalSlides) % totalSlides;
+  updateSlide();
+}
+
+function goSlide(idx) {
+  currentSlide = idx;
+  updateSlide();
+}
+
+function updateSlide() {
+  document.querySelectorAll('.slide').forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+  document.querySelectorAll('.slide-dot').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+}
+
+function startSlideshow() {
+  if (slideInterval) clearInterval(slideInterval);
+  slideInterval = setInterval(() => changeSlide(1), 4000);
+}
+</script>
+</body>
+</html>
